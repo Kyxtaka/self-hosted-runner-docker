@@ -36,3 +36,5 @@ Docker image for self hosted runner v2-328
         RUNNER_TOKEN: "<RUNNER TOKEN>"
 
 ```
+
+## IMPORTANT don't forget to `sudo chmod -R 777 ./runner-data` or you runner's jobs will fail due to Unauthorized access
