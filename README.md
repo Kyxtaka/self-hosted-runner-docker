@@ -18,9 +18,18 @@ You have to have it already installed into your server system
 {
   "exec-opts": ["native.cgroupdriver=systemd"],
   "ipv6": true,
-  "fixed-cidr-v6": "<ipv6 of your home network to give to docker>" #exemple "2a02:1500:98a:88e1:1000::/80" ==> 2a02:1500:98a:88e1 = network prefix and :1000 network for docker :80 = subnet
+  "fixed-cidr-v6": "<ipv6 of your home network to give to docker>" #exemple "2a02:1500:98a:88e1:1001::/80" ==> 2a02:1500:98a:88e1 = network prefix and :1000 network for docker :80 = subnet # This is option if you want to create a bridge inside the daemon
 }
 ```
+
+**Note :** we use an external network in the following steps, we have to create a special docker network that route our ipv6 addresses. I named it github-runners-net
+```bash
+docker network create \
+  --driver bridge
+  --ipv6
+  --subnet "2a02:1500:98a:88e1:1000::/80"
+```
+
 ## requirement 
 Here is the requirement that you need to have to install in your host server
 ## Set up 
@@ -38,10 +47,13 @@ Here is the requirement that you need to have to install in your host server
       restart: always
   
       #Use your server host network
-      network_mode: null
+      network_mode: null #you can use docker bridge network if you want (if you do this skip network creation)
       networks:
         github-runners-net:
-          ipv6_address: 2a02:1500:98a:88e1:1000::10 # your runner IP
+          ipv6_address: 2a02:1500:98a:88e1:1000::10 # your runner IP #optionnal
+
+      #networks:
+        #- github-runners-net
   
       # limit your ressources
       deploy:
@@ -85,8 +97,11 @@ services:
     privileged: true
 
     networks:
-      github-runners-net:
-        ipv6_address: <ipv6>
+        github-runners-net:
+          ipv6_address: 2a02:1500:98a:88e1:1000::10 # your runner IP #optionnal
+
+    #networks:
+        #- github-runners-net
 
     deploy:
       resources:
