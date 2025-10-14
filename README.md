@@ -19,6 +19,8 @@ You have to have it already installed into your server system
   "exec-opts": ["native.cgroupdriver=systemd"],
   "ipv6": true,
   "fixed-cidr-v6": "<ipv6 of your home network to give to docker>" #exemple "2a02:1500:98a:88e1:1001::/80" ==> 2a02:1500:98a:88e1 = network prefix and :1000 network for docker :80 = subnet # This is option if you want to create a bridge inside the daemon
+  "ip6tables": true,
+  "exeperimental": true
 }
 ```
 
