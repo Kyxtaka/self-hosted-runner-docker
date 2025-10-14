@@ -1,5 +1,6 @@
 # self-hosted-runner-docker
 Docker image for self hosted runner v2-328
+# Just Pull image
 ## Only available for trust poeple who have access to my registry
 ## Important :
 This project is to create home server and virtualize github runner with docker. 
@@ -66,3 +67,47 @@ Here is the requirement that you need to have to install in your host server
 ```
 
 ## IMPORTANT don't forget to `sudo chmod -R 777 ./runner-data` or you runner's jobs will fail due to Unauthorized access And check your runners tags in settings 
+
+# By cloning repo and build image with docker file 
+## TODO
+
+```yml
+version: "3.9"
+
+services:
+  github-runner:
+    build:
+      context: .
+      args:
+        DOCKER_GID: 124 #use host docker GID
+    container_name: github-runner
+    restart: always
+    privileged: true
+
+    networks:
+      github-runners-net:
+        ipv6_address: <ipv6>
+
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"       # limit 2 core CPU
+          memory: 2g        # limit 2 GB of RAM
+
+    volumes:
+      - ./runner-data:/home/runner/_work
+      - /var/run/docker.sock:/var/run/docker.sock
+
+    environment:
+      RUNNER_NAME: my-runner #optionnal
+      RUNNER_LABELS: ipv6,linux #optionnal
+      RUNNER_WORKDIR: /home/runner/_work
+      REPO_URL: "<REpo URL>"
+      RUNNER_TOKEN: "<TOKEN>"
+      #DOCKER_GID: 124
+
+
+networks:
+  github-runners-net:
+    external: true
+```
