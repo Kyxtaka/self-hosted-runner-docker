@@ -51,6 +51,7 @@ Here is the requirement that you need to have to install in your host server
   
       volumes:
         - ./runner-data:/home/runner/_work
+        - /var/run/docker.sock:/var/run/docker.sock # use host socket to build and push (Docker)
   
       environment:
         RUNNER_NAME: my-runner # optionnal
