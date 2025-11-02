@@ -25,6 +25,8 @@ You have to have it already installed into your server system
 ```
 
 **Note :** we use an external network in the following steps, we have to create a special docker network that route our ipv6 addresses. I named it github-runners-net
+
+### add ipv6 to your bridge network
 ```bash
 docker network create \
   --driver bridge
@@ -42,49 +44,60 @@ Here is the requirement that you need to have to install in your host server
 - log in to the owner registry with your given credentials ==> `docker login <my registry ip>`
 - create the docker compose file
 
+## IMPORTANT don't forget to `sudo chmod -R 777 ./runner-data` or you runner's jobs will fail due to Unauthorized access And check your runners tags in settings 
+
+### Using image given from the container (docker-registry.hikarizsu.fr/github-runner:latest)
+
+- create a folder for your runner
+- mkdir ./runner-data
+- chmod 755 ./runner-data
+- copy you crednetials into the docker compose
+
+
 ```yml
-  services:
-    github-runner:
-      container_name: docker-registry.hikarizsu.fr/github-runner:latest
-      restart: always
-  
-      #Use your server host network
-      network_mode: null #you can use docker bridge network if you want (if you do this skip network creation)
-      networks:
-        github-runners-net:
-          ipv6_address: 2a02:1500:98a:88e1:1000::10 # your runner IP #optionnal
+services:
+  github-runner:
+    image: docker-registry.hikarizsu.fr/github-runner:latest
+    container_name: <repo_name>-runner-<runnerID or number>
+    restart: always
 
-      #networks:
-        #- github-runners-net
-  
-      # limit your ressources
-      deploy:
-        resources:
-          limits:
-            cpus: "2.0"       # limit to 2 core
-            memory: 2g        # limit to 2gof ram
-  
-      volumes:
-        - ./runner-data:/home/runner/_work
-        - /var/run/docker.sock:/var/run/docker.sock # use host socket to build and push (Docker)
-  
-      environment:
-        RUNNER_NAME: my-runner # optionnal
-        RUNNER_LABELS: ipv6,linux # optionnal
-        RUNNER_WORKDIR: /home/runner/_work
-        REPO_URL: "<REPO URL>"
-        RUNNER_TOKEN: "<RUNNER TOKEN>"
-  networks:
-    github-runners-net:
-      external: true
+    #Use your server host network
+    networks:
+      github-runners-net:
+        # ipv6_address: 2a02:1500:98a:88e1:1000::10 # your runner IP #optionnal
 
+    # limit your ressources
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"       # limit to 2 core
+          memory: 2g        # limit to 2gof ram
+
+    volumes:
+      - ./runner-data:/home/runner/_work #dont forger to chmod 755 -> ./runner-data
+      - /var/run/docker.sock:/var/run/docker.sock # use host socket to build and push (Docker)
+
+    environment:
+      RUNNER_NAME: my-runner # optionnal
+      RUNNER_LABELS: ipv6,linux # optionnal
+      RUNNER_WORKDIR: /home/runner/_work
+      REPO_URL: "<REPO URL>"
+      RUNNER_TOKEN: "<RUNNER TOKEN>"
+      
+networks:
+  github-runners-net:
+    external: true
 ```
 
 ## IMPORTANT don't forget to `sudo chmod -R 777 ./runner-data` or you runner's jobs will fail due to Unauthorized access And check your runners tags in settings 
 
 # By cloning repo and build image with docker file 
-## TODO
 
+### Using src file
+
+- remove pull.docker-compose.yml
+- rename 'build' from docker-compose and Docker file
+- docker compose up -d
 ```yml
 version: "3.9"
 
@@ -100,7 +113,7 @@ services:
 
     networks:
         github-runners-net:
-          ipv6_address: 2a02:1500:98a:88e1:1000::10 # your runner IP #optionnal
+           #ipv6_address: 2a02:1500:98a:88e1:1000::10 # your runner IP #optionnal
 
     #networks:
         #- github-runners-net
@@ -122,7 +135,6 @@ services:
       REPO_URL: "<REpo URL>"
       RUNNER_TOKEN: "<TOKEN>"
       #DOCKER_GID: 124
-
 
 networks:
   github-runners-net:

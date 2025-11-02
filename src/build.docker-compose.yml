@@ -1,0 +1,38 @@
+services:
+  github-runner:
+    build: 
+      context: .
+      args:
+        DOCKER_GID: 124
+    container_name: github-runner
+    restart: always
+    privileged: true
+
+    # 🌐 Réseau : utilise l'IPv6 du host (si ton serveur est IPv6-only)
+    networks:
+      github-runners-net: 
+
+    # 🧠 Ressources limitées
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"       # limite à 2 cœurs CPU
+          memory: 2g        # limite à 2 Go de RAM
+
+    # 🗂️ Volume persistant pour la configuration du runner
+    volumes:
+      - ./runner-data:/home/runner/_work
+      - /var/run/docker.sock:/var/run/docker.sock
+
+    # 🧩 Variables d’environnement (optionnelles)
+    environment:
+      RUNNER_NAME: my-runner
+      RUNNER_LABELS: ipv6,linux
+      RUNNER_WORKDIR: /home/runner/_work
+      REPO_URL: "https://github.com/Kyxtaka/online_server_project"
+      RUNNER_TOKEN: "BADANLTXY7COJ4SH2T5JOCLI5ZA5S"
+      #DOCKER_GID: 124
+
+networks:
+  github-runners-net:
+    external: true
