@@ -31,7 +31,7 @@ You have to have it already installed into your server system
 docker network create \
   --driver bridge
   --ipv6
-  --subnet "2a02:1500:98a:88e1:1000::/80"
+  --subnet "2a02:1500:98a:88e1:1000::/80" 
 ```
 
 ## requirement 
