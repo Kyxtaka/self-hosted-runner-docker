@@ -1,0 +1,39 @@
+services:
+  github-runner:
+    image: docker-registry.hikarizsu.fr/github-runner:latest
+    container_name: <container_name>
+    restart: always
+
+    #Use your server host network
+    #network_mode: null #you can use docker bridge network (need some docker conf edition) if you want (if you do this skip network creation)
+    #networks:
+      #- github-runners-net
+    networks:
+      github-runners-net:
+        #ipv6_address: 2a02:1500:98a:88e1:1000::10 # your runner IP #optionnal
+
+    
+
+    # limit your ressources
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"       # limit to 2 core
+          memory: "150m"        # limit to 150MB of ram
+
+    volumes:
+      - ./runner-data:/home/runner/_work
+      - /var/run/docker.sock:/var/run/docker.sock # use host socket to build and push (Docker)
+
+    # you can also use an env file to store your variables
+    environment:
+      RUNNER_NAME: my-runner-2 # optionnal
+      RUNNER_LABELS: ipv6,linux # optionnal
+      RUNNER_WORKDIR: /home/runner/_work
+      REPO_URL: <repo url>
+      RUNNER_TOKEN: <repo token>
+      
+networks:
+  github-runners-net:
+    external: true
+
